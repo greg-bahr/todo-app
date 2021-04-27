@@ -16,6 +16,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var todos: ArrayList<Todo>
+    private lateinit var filteredTodos: ArrayList<Todo>
     private lateinit var recyclerView: RecyclerView
     private lateinit var todoAdapter: TodoRecyclerViewAdapter
 
@@ -53,15 +54,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun finishTodo(todo: Todo) {
+        val inFilteredTodos = filteredTodos.contains(todo)
         TodoSingleton.deleteTodo(todo)
+        filteredTodos.remove(todo)
+
         todoAdapter.notifyDataSetChanged()
         Snackbar.make(this, recyclerView, "Completed todo.", Snackbar.LENGTH_LONG)
-            .setAction("Undo") { undoFinishedTodo(todo) }
+            .setAction("Undo") { undoFinishedTodo(todo, inFilteredTodos) }
             .show()
     }
 
-    private fun undoFinishedTodo(todo: Todo) {
+    private fun undoFinishedTodo(todo: Todo, inFilteredTodos: Boolean) {
         TodoSingleton.addTodo(todo)
+        if (inFilteredTodos) {
+            filteredTodos.add(todo)
+        }
         todoAdapter.notifyDataSetChanged()
     }
 
@@ -78,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 val searchText = newText ?: ""
-                val filteredTodos =
+                filteredTodos =
                     todos.filter { it.text.contains(searchText, true) } as ArrayList<Todo>
                 todoAdapter.updateTodos(filteredTodos)
                 return true
@@ -86,6 +93,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         searchView.setOnCloseListener {
+            filteredTodos = todos
             todoAdapter.updateTodos(todos)
             true
         }
