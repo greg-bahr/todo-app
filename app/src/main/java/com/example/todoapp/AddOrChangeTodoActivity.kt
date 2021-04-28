@@ -13,7 +13,7 @@ import java.util.*
 
 class AddOrChangeTodoActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
-    private lateinit var dueDate: Date
+    private var dueDate: Date? = null
     private lateinit var todoDate: EditText
     private lateinit var todoText: EditText
     private var isEditing = false
@@ -41,6 +41,7 @@ class AddOrChangeTodoActivity : AppCompatActivity(), DatePickerDialog.OnDateSetL
             todoText.setText(todo?.text)
             todo?.date?.let {
                 todoDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(it))
+                dueDate = it
             }
 
             toolbar.title = "Edit Todo"
@@ -68,7 +69,7 @@ class AddOrChangeTodoActivity : AppCompatActivity(), DatePickerDialog.OnDateSetL
 
     private fun submit() {
         if (todoText.length() > 0) {
-            val todo = Todo(todoText.text.toString(), dueDate)
+            val todo = Todo(todoText.text.toString(), dueDate, "")
             TodoSingleton.addTodo(todo)
 
             val intent = Intent(this, MainActivity::class.java)
@@ -82,6 +83,6 @@ class AddOrChangeTodoActivity : AppCompatActivity(), DatePickerDialog.OnDateSetL
         }
 
         dueDate = calendar.time
-        todoDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(dueDate))
+        todoDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(calendar.time))
     }
 }
