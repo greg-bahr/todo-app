@@ -11,12 +11,16 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "MainActivity"
 
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             initAdapter()
         }
+        startNotificationWorker()
     }
 
     private fun initAdapter() {
@@ -74,6 +79,16 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Log.e(TAG, "Error getting todos: ", it)
             }
+    }
+
+    private fun startNotificationWorker() {
+        WorkManager.getInstance(this).cancelAllWorkByTag("todo_notification")
+        val notificationWorkRequest: WorkRequest =
+            PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS, 6, TimeUnit.HOURS)
+                .addTag("todo_notification")
+                .build()
+//        val notificationWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<NotificationWorker>().build()
+        WorkManager.getInstance(this).enqueue(notificationWorkRequest)
     }
 
     private fun addTodo() {

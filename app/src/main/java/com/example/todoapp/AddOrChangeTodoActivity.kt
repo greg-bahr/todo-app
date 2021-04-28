@@ -79,7 +79,8 @@ class AddOrChangeTodoActivity : AppCompatActivity(), DatePickerDialog.OnDateSetL
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         val calendar = Calendar.getInstance().apply {
-            set(year, month, dayOfMonth)
+            set(year, month, dayOfMonth, 0, 0, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 
         dueDate = calendar.time
