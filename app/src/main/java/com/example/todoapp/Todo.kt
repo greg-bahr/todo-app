@@ -2,6 +2,6 @@ package com.example.todoapp
 
 import java.util.*
 
-data class Todo(val text: String, val date: Date?) {
+data class Todo(var text: String, var date: Date?) {
     var id: String = ""
 }

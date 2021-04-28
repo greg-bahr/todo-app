@@ -3,7 +3,6 @@ package com.example.todoapp
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -25,32 +24,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        TodoSingleton.todos = arrayListOf(
-            Todo("this is a test todo", null),
-            Todo("this is another test todo", Date())
-        )
         todos = TodoSingleton.todos!!
 
         val fab: FloatingActionButton = findViewById(R.id.add_todo)
-        fab.setOnClickListener {
-            Toast.makeText(this@MainActivity, "Add todo", Toast.LENGTH_SHORT).show()
-        }
+        fab.setOnClickListener { addTodo() }
 
         recyclerView = findViewById(R.id.todo_rv)
         todoAdapter = TodoRecyclerViewAdapter(
-            todos,
-            { todo -> finishTodo(todo) },
-            { todo -> editTodo(todo) }
+                todos,
+                { todo -> finishTodo(todo) },
+                { todo -> editTodo(todo) }
         )
         recyclerView.adapter = todoAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
+    private fun addTodo() {
+        val intent = Intent(this, AddOrChangeTodoActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun editTodo(todo: Todo) {
         val intent = Intent(this, AddOrChangeTodoActivity::class.java)
-        intent.putExtra("text", todo.text)
-        todo.date?.let { intent.putExtra("date", it.time) }
+        intent.putExtra("index", TodoSingleton.todos?.indexOf(todo))
+        startActivity(intent)
     }
 
     private fun finishTodo(todo: Todo) {
